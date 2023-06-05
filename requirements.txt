@@ -1,11 +1,12 @@
-gensim==4.3.1
-pandas==1.5.3
 python-magic~=0.4.27
 pathlib~=1.0.1
 nltk~=3.8.1
+pypdf2~=3.0.1
+textract~=1.6.5
 pytesseract~=0.3.10
-pdf2image~=1.16.3
 Pillow~=9.5.0
+pandas~=1.5.3
+gensim~=4.3.1
 Flask~=2.3.2
 pydantic~=1.10.8
-
+Werkzeug~=2.3.4

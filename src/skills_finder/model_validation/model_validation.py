@@ -1,3 +1,8 @@
+import logging
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
 def model_validation(trained_model, extracted_text):
     """
     getting the word vector and checking for similarity and returning the word
@@ -6,24 +11,30 @@ def model_validation(trained_model, extracted_text):
     @param extracted_text:
     @param trained_model:
     """
-    word_vectors = trained_model
-    extracted_data = extracted_text
+    try:
+        word_vectors = trained_model
+        extracted_data = extracted_text
 
-    valid_tokens = [word for word in extracted_data if word in word_vectors.key_to_index]
-    print(valid_tokens)
+        valid_tokens = [word for word in extracted_data if word in word_vectors.key_to_index]
+        logging.info("Task: Validating Tokens: (model_validation) executed")
 
-    "test_tokens are the test_tokens = test_sentence.split() , test_sentence is the input text"
-    if valid_tokens:
-        avg_vector = sum(word_vectors.get_vector(word) for word in valid_tokens) / len(valid_tokens)
-        similar_words = word_vectors.similar_by_vector(avg_vector)
+        if valid_tokens:
+            avg_vector = sum(word_vectors.get_vector(word) for word in valid_tokens) / len(valid_tokens)
+            similar_words = word_vectors.similar_by_vector(avg_vector)
+            logging.info("Task: Calculating Similarity Score: (model_validation) executed")
 
-        extracted_skills = []
+            extracted_skills = []
 
-        for word, similarity in similar_words:
-            if similarity == 0.1:
-                extracted_skills.append(word)
+            for word, similarity in similar_words:
+                if similarity >= 0.2:
+                    extracted_skills.append(word)
+                    logging.info("Task: Appending Similar Words to extracted_skills: (model_validation) executed")
+            return extracted_skills
 
-        return extracted_skills
+        else:
+            return "No valid tokens found in the vocabulary."
 
-    else:
-        return "No valid tokens found in the vocabulary."
+    except Exception as e:
+        logging.debug("Some Error Occured: (model_validation)")
+        return str(e)
+

@@ -1,20 +1,21 @@
+import magic
 from flask import Flask, request, jsonify
 from src.skills_finder.pipeline.pipeline import ExtractingSkills
 from src.utils.constants import resume_path
-from pydantic import BaseModel, validator, FilePath
 
 main = Flask(__name__)
 
 
-class FileInput(BaseModel):
-    file_path: FilePath
+def check_file_type(file):
+    file_magic = magic.Magic(mime=True)
+    file_type = file_magic.from_buffer(file.read())
 
-    @validator('file_path')
-    def validate_file(cls, value):
-        if value.endswith(('.jpg', '.jpeg', '.png', '.pdf', '.doc', '.docx')):
-            return value
-        else:
-            raise ValueError("invalid file type!")
+    allowed_types = ['application/pdf', 'image/']
+
+    if any(file_type.startswith(t) for t in allowed_types):
+        return file
+
+    raise ValueError('Invalid File Format!')
 
 
 @main.route("/", methods=["POST"])
@@ -26,14 +27,16 @@ def get_file():
     try:
         response = []
         file_path = request.files['file']
+        valid_file = check_file_type(file_path)
 
-        file_path.save(resume_path / file_path.filename)
-        input_file_name = file_path.filename
+        if valid_file:
+            file_path.save(resume_path / file_path.filename)
+            input_file_name = file_path.filename
 
-        process = ExtractingSkills(input_file_name)
-        result = process.pipeline()
-        response.append(result)
-        return jsonify(response)
+            process = ExtractingSkills(input_file_name)
+            result = process.pipeline()
+            response.append(result)
+            return jsonify(response)
 
     except Exception as e:
         return str(e)
