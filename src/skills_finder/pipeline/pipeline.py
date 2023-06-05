@@ -1,23 +1,25 @@
+from src.preprocessing.preprocessing import PreProcessing
 from src.skills_finder.model_training.model_training import model_training
 from src.skills_finder.model_validation.model_validation import model_validation
-from src.utils.constants import file_path
 
 
-class Extracting_Skills:
-    def __init__(self):
+class ExtractingSkills:
+    def __init__(self, filename):
         """
         getting data from preprocessing function and calculating the accuracy of k-means
-         @param dataframe
-        @type dataframe
+        @param filename: input file name
         """
-        self.dataset = file_path
+        self.filename = filename
 
     def pipeline(self):
         """
         getting the dataframe and calling all the steps in building the model
         @return: accuracy
         """
-        processed_dataframe = pre_processing(self.dataset)
-        trained_model = model_training(processed_dataframe)
-        extracted_skills = model_validation(trained_model)
+        file_name = self.filename
+        extract_data = PreProcessing(file_name)
+
+        extracted_text = extract_data.extract_text()
+        trained_model = model_training()
+        extracted_skills = model_validation(trained_model, extracted_text)
         return extracted_skills
