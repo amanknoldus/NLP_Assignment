@@ -1,5 +1,11 @@
-import pathlib
+from pathlib import Path
+from nltk.corpus import stopwords
 
-path = pathlib.Path(__file__).resolve().parent.parent
-dataset_path = path / "dataset"
-file_path = dataset_path / "extraction_skill.csv"
+path = Path(__file__).resolve().parent.parent
+data_path = path / "dataset"
+resume_path = data_path / "resumes"
+file_path = data_path / "extraction_skill.csv"
+
+
+stopwords = set(stopwords.words("english"))
+
