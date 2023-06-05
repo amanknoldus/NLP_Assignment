@@ -4,11 +4,10 @@ import pandas as pd
 from src.utils.constants import file_path
 
 
-def model_training(resume_text):
+def model_training():
     """
     getting the resume text and training it
-    :param resume_text
-    :return word vectors
+    @return word vectors
     """
     data = pd.read_csv(file_path)
     sentences = data['skill_set'].tolist()

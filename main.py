@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from src.preprocessing.preprocessing import PreProcessing
+from src.skills_finder.pipeline.pipeline import ExtractingSkills
 from src.utils.constants import resume_path
 from pydantic import BaseModel, validator, FilePath
 
@@ -30,8 +30,8 @@ def get_file():
         file_path.save(resume_path / file_path.filename)
         input_file_name = file_path.filename
 
-        process = PreProcessing(input_file_name)
-        result = process.extract_text()
+        process = ExtractingSkills(input_file_name)
+        result = process.pipeline()
         response.append(result)
         return jsonify(response)
 
