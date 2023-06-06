@@ -36,7 +36,7 @@ def get_model_training():
     """
     try:
         trained_model = model_training()
-        pickle.dump(trained_model, open(saved_model / "sill_extract.pkl", 'wb'))
+        pickle.dump(trained_model, open(saved_model / "skill_extract.pkl", 'wb'))
         return "Model Trained Successfully", 200
 
     except Exception as e:
