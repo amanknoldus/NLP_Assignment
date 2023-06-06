@@ -1,9 +1,8 @@
-import PyPDF2
-import textract
-import pytesseract
+import os
+
 from src.utils.constants import resume_path, stopwords
-from src.utils.helpers.file_checker import is_pdf, image_checker, word_checker
-from PIL import Image
+from src.utils.helpers.data_extraction import extract_text_from_pdf, extract_text_from_word, extract_text_from_image
+from src.utils.helpers.file_checker import is_pdf, image_checker, is_word_document
 import re
 import logging
 from nltk.tokenize import word_tokenize
@@ -21,41 +20,43 @@ class PreProcessing:
         Function to extract text data from input file: (pdf,word or image)
         @return: extracted skills array
         """
+        try:
+            file_name = self.filename
+            resume = resume_path / file_name
+            logging.info("Task: Setting Resume File Name: (extract_text) executed")
 
-        file_name = self.filename
-        resume = resume_path / file_name
-        logging.info("Task: Setting Resume File Name: (extract_text) executed")
+            if is_pdf(resume):
+                logging.info("Task: Entered into Text Data From Pdf: (extract_text) executed")
+                text_data = extract_text_from_pdf(resume)
+                cleaned_data = self.clean_text_data(text_data)
+                tokenized_data = self.tokenize_data(cleaned_data)
+                logging.info("Task: Exited Text Data From PDF: (extract_text) executed")
+                return tokenized_data
 
-        if is_pdf(resume):
-            text_data = ''
-            pdf_reader = PyPDF2.PdfReader(resume)
-            num_pages = len(pdf_reader.pages)
-            for page_num in range(num_pages):
-                page = pdf_reader.pages[page_num]
-                text_data += page.extract_text()
+            elif is_word_document(resume):
+                logging.info("Task: Entered into Text Data From Word: (extract_text) executed")
+                text_data = extract_text_from_word(resume)
+                cleaned_data = self.clean_text_data(text_data)
+                tokenized_data = self.tokenize_data(cleaned_data)
+                logging.info("Task: Exited Text Data From Word: (extract_text) executed")
+                return tokenized_data
 
-            cleaned_data = self.clean_text_data(text_data)
-            tokenized_data = self.tokenize_data(cleaned_data)
-            logging.info("Task: Extracting Text Data From PDF: (extract_text) executed")
-            return tokenized_data
+            elif image_checker(resume):
+                logging.info("Task: Entered into Text Data From Image: (extract_text) executed")
+                text_data = extract_text_from_image(resume)
+                cleaned_data = self.clean_text_data(text_data)
+                tokenized_data = self.tokenize_data(cleaned_data)
+                logging.info("Task: Exited from Text Data From Image: (extract_text) executed")
+                return tokenized_data
 
-        if word_checker(resume):
-            text_data = textract.process(resume)
-            cleaned_data = self.clean_text_data(text_data)
-            tokenized_data = self.tokenize_data(cleaned_data)
-            logging.info("Task: Extracting Text Data From Word: (extract_text) executed")
-            return tokenized_data
+            else:
+                os.remove(resume)
+                logging.info("Invalid file format received as Input: (extract_text)")
+                raise ValueError
 
-        # elif image_checker(resume):
-        #     image = Image.open(resume)
-        #     text_data = pytesseract.image_to_string(image)
-        #     cleaned_data = self.clean_text_data(text_data)
-        #     tokenized_data = self.tokenize_data(cleaned_data)
-        #     logging.info("Task: Extracting Text Data From Image: (extract_text) executed")
-        #     return tokenized_data
-
-        else:
-            return "Invalid File Format!"
+        except ValueError:
+            logging.debug("Some Error Occured: (extract_text)")
+            raise ValueError("Invalid File Format Provided!")
 
     @staticmethod
     def clean_text_data(text_data):
@@ -79,9 +80,9 @@ class PreProcessing:
             logging.info("Task: Replacing new line tags: (clean_text_data) executed")
             return replaced_newline_tag.lower().strip()
 
-        except Exception as e:
+        except ValueError:
             logging.debug("Some Error Occured: (clean_text_data)")
-            return str(e)
+            raise ValueError
 
     @staticmethod
     def tokenize_data(cleaned_data):
@@ -96,9 +97,8 @@ class PreProcessing:
 
             filtered_tokens = [word for word in tokens if word.lower() not in stopwords]
             logging.info("Task: Removing Stop Words: (tokenize_data) executed")
-
             return filtered_tokens
 
-        except Exception as e:
+        except ValueError:
             logging.debug("Some Error Occured: (tokenize_data)")
-            return str(e)
+            raise ValueError

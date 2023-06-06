@@ -5,7 +5,7 @@ path = Path(__file__).resolve().parent.parent
 data_path = path / "dataset"
 resume_path = data_path / "resumes"
 file_path = data_path / "extraction_skill.csv"
-
+saved_model = path / "nlp_model"
+model_location = saved_model / "sill_extract.pkl"
 
 stopwords = set(stopwords.words("english"))
-

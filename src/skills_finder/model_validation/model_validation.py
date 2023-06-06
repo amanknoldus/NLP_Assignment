@@ -12,29 +12,28 @@ def model_validation(trained_model, extracted_text):
     @param trained_model:
     """
     try:
-        word_vectors = trained_model
-        extracted_data = extracted_text
+        if extracted_text:
+            valid_tokens = [word for word in extracted_text if word in trained_model.key_to_index]
+            logging.info("Task: Validating Tokens: (model_validation) executed")
 
-        valid_tokens = [word for word in extracted_data if word in word_vectors.key_to_index]
-        logging.info("Task: Validating Tokens: (model_validation) executed")
+            if valid_tokens:
+                avg_vector = sum(trained_model.get_vector(word) for word in valid_tokens) / len(valid_tokens)
+                similar_words = trained_model.similar_by_vector(avg_vector)
+                logging.info("Task: Calculating Similarity Score: (model_validation) executed")
 
-        if valid_tokens:
-            avg_vector = sum(word_vectors.get_vector(word) for word in valid_tokens) / len(valid_tokens)
-            similar_words = word_vectors.similar_by_vector(avg_vector)
-            logging.info("Task: Calculating Similarity Score: (model_validation) executed")
+                extracted_skills = []
+                logging.info("Task: Appending Similar Words to extracted_skills: (model_validation) executed")
 
-            extracted_skills = []
+                for word, similarity in similar_words:
+                    if similarity >= 0.2:
+                        extracted_skills.append(word)
+                return extracted_skills, 200
 
-            for word, similarity in similar_words:
-                if similarity >= 0.2:
-                    extracted_skills.append(word)
-                    logging.info("Task: Appending Similar Words to extracted_skills: (model_validation) executed")
-            return extracted_skills
-
+            else:
+                return "No valid tokens found in the vocabulary.", 204
         else:
-            return "No valid tokens found in the vocabulary."
+            return "No input received from file", 204
 
-    except Exception as e:
+    except ValueError:
         logging.debug("Some Error Occured: (model_validation)")
-        return str(e)
-
+        raise ValueError

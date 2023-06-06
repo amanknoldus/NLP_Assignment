@@ -1,7 +1,9 @@
 import logging
+import pickle
+
 from gensim.models import Word2Vec
 import pandas as pd
-from src.utils.constants import file_path
+from src.utils.constants import file_path, saved_model
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -24,4 +26,18 @@ def model_training():
 
     except Exception as e:
         logging.debug("Some Error Occured: (model_training)")
+        return str(e)
+
+
+def get_model_training():
+    """
+    Function to receive get request from server and start training of model
+    @return: Response Message
+    """
+    try:
+        trained_model = model_training()
+        pickle.dump(trained_model, open(saved_model / "sill_extract.pkl", 'wb'))
+        return "Model Trained Successfully", 200
+
+    except Exception as e:
         return str(e)
