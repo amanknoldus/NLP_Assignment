@@ -1,7 +1,9 @@
+import pickle
+
 from gensim.models import Word2Vec
 import pandas as pd
 
-from srcutils.constants import file_path
+from src.utils.constants import file_path
 
 
 def model_training(resume_text):
@@ -18,3 +20,4 @@ def model_training(resume_text):
     model = Word2Vec(tokenized_sentences, vector_size=100, window=5, min_count=1, workers=4)
     word_vectors = model.wv
     return word_vectors
+
