@@ -19,7 +19,7 @@ def model_training():
 
         tokenized_sentences = [sentence.split() for sentence in sentences]
 
-        model = Word2Vec(tokenized_sentences, vector_size=100, window=5, min_count=1, workers=4)
+        model = Word2Vec(tokenized_sentences, vector_size=200, window=1, min_count=1, workers=4)
         word_vectors = model.wv
         logging.info("Task: Training Model: (model_training) executed")
         return word_vectors
