@@ -1,7 +1,7 @@
 from gensim.models import Word2Vec
 import pandas as pd
 
-from src.utils.constants import file_path
+from srcutils.constants import file_path
 
 
 def model_training(resume_text):
