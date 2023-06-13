@@ -1,7 +1,8 @@
+import logging
+
 from gensim.models import Word2Vec
 import pandas as pd
-import nltk
-from nltk.tokenize import sent_tokenize
+
 from src.utils.constants import file_path
 
 
@@ -10,11 +11,18 @@ def model_training():
     getting the resume text and training it
     @return word vectors
     """
-    data = pd.read_csv(file_path)
-    sentences = data['skill_set'].tolist()
+    try:
 
-    tokenized_sentences = [sentence.split() for sentence in sentences]
-    print(tokenized_sentences)
-    model = Word2Vec(tokenized_sentences, vector_size=100, window=5, min_count=1, workers=4)
-    word_vectors = model.wv
-    return word_vectors
+        data = pd.read_csv(file_path)
+        skill_corpus = data['skill_set'].tolist()
+        model = Word2Vec()
+        model.build_vocab([skill_corpus], update=True)
+        model.train([skill_corpus], total_examples=len(skill_corpus), epochs=model.epochs)
+        logging.info("Task: Training Model: (model_training) executed")
+        return model
+
+    except Exception as e:
+        logging.debug("Some Error Occured: (model_training)")
+        return str(e)
+
+
