@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from src.skills_finder.model_training.model_training import model_training
+from src.skills_finder.model_training.model_training import get_model_training
 from src.skills_finder.pipeline.pipeline import ExtractingSkills
 from src.utils.constants import resume_path
 import logging
@@ -16,7 +16,7 @@ def get_model():
     @return:  Response Message
     """
     try:
-        result, response_msg = model_training()
+        result, response_msg = get_model_training()
         return result, response_msg
 
     except Exception as e:
