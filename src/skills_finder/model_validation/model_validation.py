@@ -1,21 +1,50 @@
-def model_validation(resume_text):
+import logging
+
+import pandas as pd
+
+from src.utils.constants import file_path
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+
+def expanding_tokens(text):
+    expanded_tokens = []
+    for i, token in enumerate(text):
+        expanded_tokens.append(token)
+        if i < len(text) - 1:
+            expanded_tokens.append(' '.join([token, text[i + 1]]))
+        return expanded_tokens
+
+
+def model_validation(trained_model, extracted_text):
     """
     getting the word vector and checking for similarity and returning the word
-     who have similarity of one
-    :param resume_text
-    :return extracted skills
+    who have similarity of one
+    @return extracted skills
+    @param extracted_text
+    @param trained_model
     """
-    word_vectors = resume_text[0]
+    data = pd.read_csv(file_path)
+    skill_corpus = data['skill_set'].tolist()
+    expanded_tokens = expanding_tokens(extracted_text)
+    word_vectors = trained_model
+    similar_words = []
+    for word in expanded_tokens:
+        for skill_word in skill_corpus:
+            try:
+                vec1 = word_vectors[word]
+                vec2 = word_vectors[skill_word]
+                word_set = set(vec1)
+                skill_word_set = set(vec2)
+                intersection = len(word_set.intersection(skill_word_set))
+                union = len(word_set.union(skill_word_set))
+                jaccard_similarity = intersection / union
+                if jaccard_similarity >= 0.5:
+                    similar_words.append(word)
+            except ValueError:
+                logging.debug("Some Error Occured: (model_validation)")
+                raise ValueError
 
-    valid_tokens = [word for word in test_tokens if word in word_vectors.key_to_index]
-    "test_tokens are the test_tokens = test_sentence.split() , test_sentence is the input text"
-    if valid_tokens:
-        avg_vector = sum(word_vectors.get_vector(word) for word in valid_tokens) / len(valid_tokens)
-        similar_words = word_vectors.similar_by_vector(avg_vector)
-        extracting_skills = []
-        for word, similarity in similar_words:
-            if similarity == 1.0:
-                extracting_skills.append(word)
-        return extracting_skills
-    else:
-        return "No valid tokens found in the vocabulary."
+    unique_values = set(similar_words)
+    for value in unique_values:
+        return value

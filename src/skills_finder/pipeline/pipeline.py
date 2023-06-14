@@ -1,23 +1,43 @@
-from src.skills_finder.model_training.model_training import model_training
+from src.preprocessing.preprocessing import PreProcessing
 from src.skills_finder.model_validation.model_validation import model_validation
-from src.utils.constants import file_path
+import logging
+import pickle
+
+from src.utils.constants import model_location
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+skill_finer_model = pickle.load(open(model_location, 'rb'))
 
 
-class Extracting_Skills:
-    def __init__(self):
+class ExtractingSkills:
+    def __init__(self, filename):
         """
         getting data from preprocessing function and calculating the accuracy of k-means
-         @param dataframe
-        @type dataframe
+        @param filename: input file name
         """
-        self.dataset = file_path
+        self.filename = filename
+        logging.info("Task: Setting File Name: (ExtractingSkills) executed")
 
     def pipeline(self):
         """
         getting the dataframe and calling all the steps in building the model
         @return: accuracy
         """
-        processed_dataframe = pre_processing(self.dataset)
-        trained_model = model_training(processed_dataframe)
-        extracted_skills = model_validation(trained_model)
-        return extracted_skills
+        try:
+            file_name = self.filename
+            extract_data = PreProcessing(file_name)
+
+            if extract_data:
+                extracted_text = extract_data.extract_text()
+                extracted_skills, response_msg = model_validation(skill_finer_model, extracted_text)
+                logging.info("Task: Returning Extracted Skills From Resume: (pipeline) executed")
+                return extracted_skills, response_msg
+            else:
+                raise ValueError
+
+        except ValueError:
+            logging.debug("Some Error Occured: (pipeline)")
+            raise ValueError("No text input received from preprocessing")
+
+
