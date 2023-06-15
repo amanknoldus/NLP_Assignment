@@ -2,17 +2,9 @@ import logging
 
 import pandas as pd
 from src.utils.constants import file_path
+from src.utils.helpers import configuration
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-
-
-# def expanding_tokens(text):
-#     expanded_tokens = []
-#     for i, token in enumerate(text):
-#         expanded_tokens.append(token)
-#         if i < len(text) - 1:
-#             expanded_tokens.append('_'.join([token, text[i + 1]]))
-#     return expanded_tokens
 
 
 def model_validation(trained_model, extracted_text):
@@ -39,7 +31,7 @@ def model_validation(trained_model, extracted_text):
                 intersection = len(word_set.intersection(skill_word_set))
                 union = len(word_set.union(skill_word_set))
                 jaccard_similarity = intersection / union
-                if jaccard_similarity >= 0.5:
+                if jaccard_similarity >= configuration.threshold:
                     similar_words.append(word)
             except KeyError:
                 logging.debug("Some Error Occured: (model_validation)")
@@ -49,5 +41,9 @@ def model_validation(trained_model, extracted_text):
     skills_extracted = []
     for value in unique_values:
         skills_extracted.append(value)
-    return skills_extracted, 200
+
+    if len(skills_extracted) > 0:
+        return skills_extracted, 200
+    else:
+        return "No skills found", 202
 
