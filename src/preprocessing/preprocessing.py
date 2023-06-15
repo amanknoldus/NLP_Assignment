@@ -75,10 +75,10 @@ class PreProcessing:
             removed_extra_spaces = re.sub(' +', ' ', removed_symbols)
             logging.info("Task: Removing Extra Spaces: (clean_text_data) executed")
 
-            removed_single_letters = re.sub(r'\b\w{1}\b', '',removed_extra_spaces)
-            logging.info("Task: Removing Single Letters: (cleaned_text_data) executed")
+            # removed_single_letters = re.sub(r'\b\w{1}\b', '',removed_extra_spaces)
+            # logging.info("Task: Removing Single Letters: (cleaned_text_data) executed")
 
-            removed_tags = re.sub(r'\b(ha)+\b', '', removed_single_letters)
+            removed_tags = re.sub(r'\b(ha)+\b', '', removed_extra_spaces)
             logging.info("Task: Removing Tags Spaces: (clean_text_data) executed")
 
             replaced_newline_tag = removed_tags.replace('\n', ' ')

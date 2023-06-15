@@ -49,4 +49,5 @@ def model_validation(trained_model, extracted_text):
     skills_extracted = []
     for value in unique_values:
         skills_extracted.append(value)
-        return skills_extracted, 200
+    return skills_extracted, 200
+

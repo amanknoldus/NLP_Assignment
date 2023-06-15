@@ -2,15 +2,15 @@ import PyPDF2
 import textract
 from PIL import Image
 import pytesseract
+import pdfplumber
 
 
 def extract_text_from_pdf(resume):
     text_data = ''
-    pdf_reader = PyPDF2.PdfReader(resume)
-    num_pages = len(pdf_reader.pages)
-    for page_num in range(num_pages):
-        page = pdf_reader.pages[page_num]
-        text_data += page.extract_text()
+    with pdfplumber.open(resume) as pdf:
+        for page in pdf.pages:
+            text_data += page.extract_text()
+
     return text_data
 
 
