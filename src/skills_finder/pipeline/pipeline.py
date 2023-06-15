@@ -31,7 +31,6 @@ class ExtractingSkills:
             if extract_data:
                 extracted_text = extract_data.extract_text()
                 extracted_skills, response_msg = model_validation(skill_finer_model, extracted_text)
-                print(extracted_skills)
                 logging.info("Task: Returning Extracted Skills From Resume: (pipeline) executed")
                 return extracted_skills, response_msg
             else:
