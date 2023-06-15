@@ -16,15 +16,16 @@ def model_training():
     try:
 
         data = pd.read_csv(file_path)
-        skill_corpus = data['skill_set'].tolist()
+        skill_corpus = data['skill_set_encode'].tolist()
         tokenized_corpus = [word_tokenize(skill) for skill in skill_corpus]
 
-        model = Word2Vec(tokenized_corpus, vector_size=100, window=5, min_count=1, workers=4)
+        model = Word2Vec(tokenized_corpus, size=100, window=5, min_count=1, workers=4)
 
-        vocabulary = set(model.wv.index2word)
+        # vocabulary = set(model.wv.index2word)
         model.build_vocab([skill_corpus], update=True)
         model.train([skill_corpus], total_examples=len(skill_corpus), epochs=model.epochs)
-        vocabulary = set(model.wv.vocab.keys())
+
+        # vocabulary = set(model.wv.vocab.keys())
 
         logging.info("Task: Training Model: (model_training) executed")
         return model
