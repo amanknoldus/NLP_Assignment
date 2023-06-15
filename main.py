@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 main = Flask(__name__)
 
 
-@main.get("/")
+@main.get("/skill-finder")
 def get_model():
     """
     Function to trigger training of model
@@ -23,7 +23,7 @@ def get_model():
         return str(e)
 
 
-@main.route("/", methods=["POST"])
+@main.route("/skill-finder", methods=["POST"])
 def get_file():
     """
     Function to get input file: (pdf, images, word document) and pass it for processing phase to extract skill from it.
@@ -39,9 +39,8 @@ def get_file():
 
         process = ExtractingSkills(input_file_name)
         result, response_msg = process.pipeline()
-        response.append(result)
         logging.info("Task: Returning extracted skills from file: (get_file) executed")
-        return jsonify(response), response_msg
+        return result, response_msg
 
     except ValueError:
         logging.debug("Some Error Occured: (get_file)")

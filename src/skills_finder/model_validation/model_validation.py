@@ -1,5 +1,9 @@
 import logging
 
+import pandas as pd
+from src.utils.constants import file_path
+from src.utils.helpers import configuration
+
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
@@ -8,32 +12,38 @@ def model_validation(trained_model, extracted_text):
     getting the word vector and checking for similarity and returning the word
     who have similarity of one
     @return extracted skills
-    @param extracted_text:
-    @param trained_model:
+    @param extracted_text
+    @param trained_model
     """
-    try:
-        if extracted_text:
-            valid_tokens = [word for word in extracted_text if word in trained_model.key_to_index]
-            logging.info("Task: Validating Tokens: (model_validation) executed")
+    data = pd.read_csv(file_path)
+    skill_corpus = data['skill_set_encode'].tolist()
 
-            if valid_tokens:
-                avg_vector = sum(trained_model.get_vector(word) for word in valid_tokens) / len(valid_tokens)
-                similar_words = trained_model.similar_by_vector(avg_vector)
-                logging.info("Task: Calculating Similarity Score: (model_validation) executed")
+    expanded_tokens = extracted_text
+    word_vectors = trained_model
+    similar_words = []
+    for word in expanded_tokens:
+        for skill_word in skill_corpus:
+            try:
+                vec1 = word_vectors.wv[word]
+                vec2 = word_vectors.wv[skill_word]
+                word_set = set(vec1)
+                skill_word_set = set(vec2)
+                intersection = len(word_set.intersection(skill_word_set))
+                union = len(word_set.union(skill_word_set))
+                jaccard_similarity = intersection / union
+                if jaccard_similarity >= configuration.threshold:
+                    similar_words.append(word)
+            except KeyError:
+                logging.debug("Some Error Occured: (model_validation)")
+                pass
 
-                extracted_skills = []
-                logging.info("Task: Appending Similar Words to extracted_skills: (model_validation) executed")
+    unique_values = set(similar_words)
+    skills_extracted = []
+    for value in unique_values:
+        skills_extracted.append(value)
 
-                for word, similarity in similar_words:
-                    if similarity >= 0.2:
-                        extracted_skills.append(word)
-                return extracted_skills, 200
+    if len(skills_extracted) > 0:
+        return skills_extracted, 200
+    else:
+        return "No skills found", 202
 
-            else:
-                return "No valid tokens found in the vocabulary.", 204
-        else:
-            return "No input received from file", 204
-
-    except ValueError:
-        logging.debug("Some Error Occured: (model_validation)")
-        raise ValueError
