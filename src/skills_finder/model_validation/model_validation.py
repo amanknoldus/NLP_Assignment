@@ -1,7 +1,6 @@
 import logging
 
 import pandas as pd
-
 from src.utils.constants import file_path
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -13,7 +12,7 @@ def expanding_tokens(text):
         expanded_tokens.append(token)
         if i < len(text) - 1:
             expanded_tokens.append(' '.join([token, text[i + 1]]))
-        return expanded_tokens
+    return expanded_tokens
 
 
 def model_validation(trained_model, extracted_text):

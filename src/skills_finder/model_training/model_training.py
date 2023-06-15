@@ -19,7 +19,7 @@ def model_training():
         skill_corpus = data['skill_set'].tolist()
         tokenized_corpus = [word_tokenize(skill) for skill in skill_corpus]
 
-        model = Word2Vec(tokenized_corpus, size=100, window=5, min_count=1, workers=4)
+        model = Word2Vec(tokenized_corpus, vector_size=100, window=5, min_count=1, workers=4)
 
         vocabulary = set(model.wv.index2word)
         model.build_vocab([skill_corpus], update=True)
@@ -32,7 +32,6 @@ def model_training():
     except Exception as e:
         logging.debug("Some Error Occured: (model_training)")
         return str(e)
-
 
 
 def get_model_training():
