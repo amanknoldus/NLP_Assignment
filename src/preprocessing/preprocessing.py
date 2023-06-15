@@ -1,5 +1,7 @@
 import os
 
+import nltk
+
 from src.utils.constants import resume_path, stopwords
 from src.utils.helpers.data_extraction import extract_text_from_pdf, extract_text_from_word, extract_text_from_image
 from src.utils.helpers.file_checker import is_pdf, image_checker, is_word_document
@@ -100,8 +102,22 @@ class PreProcessing:
             logging.info("Task: Tokenizing Text Data: (tokenize_data) executed")
 
             filtered_tokens = [word for word in tokens if word.lower() not in stopwords]
+            filtered_text = ' '.join(filtered_tokens)
+
+            def tokenize(text):
+                token_data = nltk.word_tokenize(text)
+                return token_data
+
+            test_tokens = tokenize(filtered_text)
+
+            expanded_tokens = []
+            for i, token in enumerate(test_tokens):
+                expanded_tokens.append(token)
+                if i < len(test_tokens) - 1:
+                    expanded_tokens.append('_'.join([token, test_tokens[i + 1]]))
+
             logging.info("Task: Removing Stop Words: (tokenize_data) executed")
-            return filtered_tokens
+            return expanded_tokens
 
         except ValueError:
             logging.debug("Some Error Occured: (tokenize_data)")
