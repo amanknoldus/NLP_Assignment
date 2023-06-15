@@ -29,27 +29,40 @@ class PreProcessing:
 
             if is_pdf(resume):
                 logging.info("Task: Entered into Text Data From Pdf: (extract_text) executed")
+
                 text_data = extract_text_from_pdf(resume)
                 cleaned_data = self.clean_text_data(text_data)
                 tokenized_data = self.tokenize_data(cleaned_data)
+                removed_stopwords = self.remove_stopwords(tokenized_data)
+                re_tokenized_data = self.tokenize_data(removed_stopwords)
+                expanded_text = self.expand_tokens(re_tokenized_data)
                 logging.info("Task: Exited Text Data From PDF: (extract_text) executed")
-                return tokenized_data
+                return expanded_text
 
             elif is_word_document(resume):
                 logging.info("Task: Entered into Text Data From Word: (extract_text) executed")
+
                 text_data = extract_text_from_word(resume)
                 cleaned_data = self.clean_text_data(text_data)
                 tokenized_data = self.tokenize_data(cleaned_data)
+                removed_stopwords = self.remove_stopwords(tokenized_data)
+                re_tokenized_data = self.tokenize_data(removed_stopwords)
+                expanded_text = self.expand_tokens(re_tokenized_data)
+
                 logging.info("Task: Exited Text Data From Word: (extract_text) executed")
-                return tokenized_data
+                return expanded_text
 
             elif image_checker(resume):
                 logging.info("Task: Entered into Text Data From Image: (extract_text) executed")
                 text_data = extract_text_from_image(resume)
                 cleaned_data = self.clean_text_data(text_data)
                 tokenized_data = self.tokenize_data(cleaned_data)
+                removed_stopwords = self.remove_stopwords(tokenized_data)
+                re_tokenized_data = self.tokenize_data(removed_stopwords)
+                expanded_text = self.expand_tokens(re_tokenized_data)
+
                 logging.info("Task: Exited from Text Data From Image: (extract_text) executed")
-                return tokenized_data
+                return expanded_text
 
             else:
                 os.remove(resume)
@@ -75,9 +88,6 @@ class PreProcessing:
             removed_extra_spaces = re.sub(' +', ' ', removed_symbols)
             logging.info("Task: Removing Extra Spaces: (clean_text_data) executed")
 
-            # removed_single_letters = re.sub(r'\b\w{1}\b', '',removed_extra_spaces)
-            # logging.info("Task: Removing Single Letters: (cleaned_text_data) executed")
-
             removed_tags = re.sub(r'\b(ha)+\b', '', removed_extra_spaces)
             logging.info("Task: Removing Tags Spaces: (clean_text_data) executed")
 
@@ -98,27 +108,41 @@ class PreProcessing:
         @return: tokenized and removed stopwords data
         """
         try:
-            tokens = word_tokenize(cleaned_data)
+            test_tokens = word_tokenize(cleaned_data)
             logging.info("Task: Tokenizing Text Data: (tokenize_data) executed")
+            return test_tokens
 
-            filtered_tokens = [word for word in tokens if word.lower() not in stopwords]
-            filtered_text = ' '.join(filtered_tokens)
+        except ValueError:
+            logging.debug("Some Error Occured: (tokenize_data)")
+            raise ValueError
 
-            def tokenize(text):
-                token_data = nltk.word_tokenize(text)
-                return token_data
+    @staticmethod
+    def remove_stopwords(tokenized_data):
+        try:
+            filtered_tokens = [word for word in tokenized_data if word.lower() not in stopwords]
+            stop_words_removed = ' '.join(filtered_tokens)
 
-            test_tokens = tokenize(filtered_text)
+            logging.info("Task: Remove Stopwords from Text Data: (tokenize_data) executed")
+            return stop_words_removed
 
+        except ValueError:
+            raise ValueError
+
+    @staticmethod
+    def expand_tokens(test_tokens):
+        """
+        Function to expand text to combined with previous and next word.
+        @param test_tokens: tokenized text
+        @return: expanded text
+        """
+        try:
             expanded_tokens = []
             for i, token in enumerate(test_tokens):
                 expanded_tokens.append(token)
                 if i < len(test_tokens) - 1:
                     expanded_tokens.append('_'.join([token, test_tokens[i + 1]]))
 
-            logging.info("Task: Removing Stop Words: (tokenize_data) executed")
             return expanded_tokens
 
-        except ValueError:
-            logging.debug("Some Error Occured: (tokenize_data)")
+        except RuntimeError:
             raise ValueError
