@@ -34,17 +34,21 @@ def get_file():
         response = []
         file_path = request.files['file']
 
-        file_path.save(resume_path / file_path.filename)
-        input_file_name = file_path.filename
+        if file_path:
+            file_path.save(resume_path / file_path.filename)
+            input_file_name = file_path.filename
 
-        process = ExtractingSkills(input_file_name)
-        result, response_msg = process.pipeline()
-        logging.info("Task: Returning extracted skills from file: (get_file) executed")
-        return result, response_msg
+            process = ExtractingSkills(input_file_name)
+            result, response_msg = process.pipeline()
+            logging.info("Task: Returning extracted skills from file: (get_file) executed")
+            return f"Skills found : {result}", response_msg
+        else:
+            logging.info("Task: No Input provided check: (get_file) executed")
+            return "No input provided", 417
 
     except ValueError:
         logging.debug("Some Error Occured: (get_file)")
-        return str(ValueError('Invalid File Format!')),
+        return str(ValueError('Invalid File Format!')), 406
 
 
 if __name__ == '__main__':
