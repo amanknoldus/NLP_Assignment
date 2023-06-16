@@ -12,7 +12,7 @@ Approach followed in building the solution:
 Steps to trigger the model training:
 
     Trigger model training: Make Get Request From Postman,
-        Request URL: "http://127.0.0.1:5000" (This is local hosted address, it might change in depending upon the port specified in different system.),
+        Request URL: "http://127.0.0.1:5000/skill-finder" (This is local hosted address, it might change depending upon the port specified in different system.),
         Request Type: "GET" >> Send,
         Response: "Model Trained Successfully".
 
@@ -20,7 +20,7 @@ Steps to get extracted skills from resume:
 
     Get Extracted Skills: Make Post Request From Postman,
 
-        Request URL: "http://127.0.0.1:5000" (This is local hosted address, it might change in depending upon the port specified in different system.),
+        Request URL: "http://127.0.0.1:5000/skill-finder" (This is local hosted address, it might change depending upon the port specified in different system.),
         Request Type: "POST",
         Steps: Body: "form-data" >> Key: "file" (select = File in key panel) >> Value: "Select File" >> Send,
         Response: Extracted Skills from Resume: List Format. 
@@ -30,7 +30,7 @@ Libraries Used:
 
     Flask~=2.3.2 >> pip install flask,
 
-    gensim~=4.3.1 >> pip install gensim,
+    gensim~=3.8.3 >> pip install gensim,
 
     nltk~=3.8.1 >> pip install nltk,
 
@@ -47,6 +47,8 @@ Libraries Used:
     python-magic~=0.4.27 >> pip install python-magic,
 
     textract~=1.6.5 >> pip install textract
+ 
+    pdfplumber~=0.9.0 >> pip install pdfplumber
 
 
-    
+NOTE : python interpreter version used is 3.8
